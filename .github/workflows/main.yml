@@ -66,5 +66,4 @@ jobs:
           
       - name: (Optional) Build and start Docker containers
         working-directory: ./distributed-performance-testing
-        run: docker compose up --build
-
+        run: docker ps -a
