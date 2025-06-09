@@ -62,7 +62,7 @@ jobs:
       - name: Install Docker and Docker Compose
         run: |
           sudo apt-get update
-          sudo apt install docker
+          sudo apt install docker.io
           sudo systemctl start docker
           sudo systemctl enable docker
           docker --version
