@@ -66,4 +66,9 @@ jobs:
           
       - name: (Optional) Build and start Docker containers
         working-directory: ./distributed-performance-testing
-        run: docker ps -a
+        run: docker compose up --build -d
+
+      - name: Run node index.js
+        working-directory: ./distributed-performance-testing/src
+        run: node index.js  
+
