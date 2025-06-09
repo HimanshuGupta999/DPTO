@@ -33,6 +33,13 @@ jobs:
         working-directory: ./distributed-performance-testing
         run: echo "Entered project directory"
 
+      - name: Debug - show environment values (safe ones only)
+        working-directory: ./distributed-performance-testing
+        run: |
+          echo "JMETER_VERSION=${JMETER_VERSION}"
+          echo "MASTER_IP=${MASTER_IP}"
+          echo "NUMBER_OF_THREADS=${NUMBER_OF_THREADS}"
+    
       - name: Create .env file from secrets
         working-directory: ./distributed-performance-testing
         run: |
