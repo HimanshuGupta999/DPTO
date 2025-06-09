@@ -59,13 +59,10 @@ jobs:
         working-directory: ./distributed-performance-testing
         run: npm install
 
-      - name: Install Docker and Docker Compose
+      - name: Check Docker installation
         run: |
-          sudo apt-get update
-          sudo apt install docker.io
-          sudo systemctl start docker
-          sudo systemctl enable docker
           docker --version
+          docker compose version || docker-compose version
           
       - name: (Optional) Build and start Docker containers
         working-directory: ./distributed-performance-testing
