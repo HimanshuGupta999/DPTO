@@ -1,0 +1,36 @@
+name: Run JMeter Load Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-jmeter:
+    runs-on: ubuntu-latest
+
+    env:
+      JMETER_VERSION: ${{ secrets.JMETER_VERSION }}
+      MASTER_IP: ${{ secrets.MASTER_IP }}
+      SLAVE_IPS: ${{ secrets.SLAVE_IPS }}
+      JMETER_DIR: ${{ secrets.JMETER_DIR }}
+      SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+      SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+      TEST_PLAN_PATH: ${{ secrets.TEST_PLAN_PATH }}
+      RESULT_PATH: ${{ secrets.RESULT_PATH }}
+      NUMBER_OF_THREADS: ${{ secrets.NUMBER_OF_THREADS }}
+
+    steps:
+      - name: Checkout code from main branch
+        uses: actions/checkout@v3
+        with:
+          ref: main
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  # Use the version required by your project
+
+      - name: Install npm packages
+        run: npm install
+
+      - name: (Optional) Build and start Docker containers
+        run: docker-compose up --build -d
