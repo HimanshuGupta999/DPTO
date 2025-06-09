@@ -17,8 +17,8 @@ jobs:
       MASTER_IP: ${{ secrets.MASTER_IP }}
       SLAVE_IPS: ${{ secrets.SLAVE_IPS }}
       JMETER_DIR: ${{ secrets.JMETER_DIR }}
-      SSH_USERNAME: ${{ vars.SSH_USERNAME }}
-      SSH_PASSWORD: ${{ vars.SSH_PASSWORD }}
+      SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+      SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
       TEST_PLAN_PATH: ${{ secrets.TEST_PLAN_PATH }}
       RESULT_PATH: ${{ secrets.RESULT_PATH }}
       NUMBER_OF_THREADS: ${{ secrets.NUMBER_OF_THREADS }}
@@ -54,16 +54,20 @@ jobs:
           RESULT_PATH=${RESULT_PATH}
           NUMBER_OF_THREADS=${NUMBER_OF_THREADS}
           EOF
-
+          
       - name: Install npm dependencies
         working-directory: ./distributed-performance-testing
         run: npm install
 
       - name: Check Docker installation
-        working-directory: ./distributed-performance-testing/src
         run: |
           docker --version
           docker compose version || docker-compose version
-          docker compose up --build -d
-          node index.js 
+          
+      - name: Build and start Docker containers
+        working-directory: ./distributed-performance-testing
+        run: docker compose up --build -d
 
+      - name: Run node index.js
+        working-directory: ./distributed-performance-testing/src
+        run: node index.js  
