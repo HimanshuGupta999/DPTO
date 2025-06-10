@@ -81,9 +81,18 @@ jobs:
           name: distributed-test-results
           path: ./distributed-performance-testing/test-files/
 
+      - name: Copy logs files to AiPerfTestAnalysis/inputs
+        run: |
+          cp ./distributed-performance-testing/test-files/*.log ./AiPerfTestAnalysis/inputs/
+
+      - name: Copy statistics files to AiPerfTestAnalysis/inputs
+        run: |
+          find ./distributed-performance-testing/test-files/ -type f -path "*/html_report*/statistics.json" -exec cp {} ./AiPerfTestAnalysis/inputs/
+
       - name: Create .env file from secrets
         working-directory: ./AiPerfTestAnalysis
         run: |
+          ls
           cat <<EOF > .env
           GEMINI_MODEL_ID=${GEMINI_MODEL_ID}
           GEMINI_API_KEY=${GEMINI_API_KEY}
