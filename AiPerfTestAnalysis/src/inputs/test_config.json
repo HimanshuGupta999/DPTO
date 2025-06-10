@@ -1,0 +1,26 @@
+{
+  "context": {
+    "test_name": "testplan_1k_user",
+    "actual_load": {
+      "users": 1000,
+      "duration": 60,
+      "ramp_up": 30
+    },
+    "infra": {
+      "cpu_cores_per_node": 4,
+      "memory_gb_per_node": 8,
+      "total_nodes": 3,
+      "disk_type": "SSD"
+    },
+    "expected_validations": {
+      "throughput_rps": 350,
+      "response_code": 200,
+      "max_response_time_ms": 750
+    }
+  },
+  "questions": [
+    "What infra improvements would help us meet a 500ms response time SLA?",
+    "How can we reach 1000 RPS with minimal additional cost?"
+  ],
+  "test_feature": "Login + View Order History"
+}
