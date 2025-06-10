@@ -84,12 +84,11 @@ jobs:
       - name: Copy logs files to AiPerfTestAnalysis/inputs
         run: |
           mkdir -p ./AiPerfTestAnalysis/inputs
-          cp ./distributed-performance-testing/test-files/*.log ./AiPerfTestAnalysis/inputs/
+          cp ./distributed-performance-testing/test-files/*.log ./AiPerfTestAnalysis/src/inputs/
 
       - name: Copy statistics files to AiPerfTestAnalysis/inputs
         run: |
-          mkdir -p ./AiPerfTestAnalysis/inputs
-          find ./distributed-performance-testing/test-files/ -type f -path "*/html_report*/statistics.json" -exec cp {} ./AiPerfTestAnalysis/inputs/
+          find ./distributed-performance-testing/test-files/ -type f -path "*/html_report*/statistics.json" -exec cp {} ./AiPerfTestAnalysis/src/inputs/
 
       - name: Create .env file from secrets
         working-directory: ./AiPerfTestAnalysis
