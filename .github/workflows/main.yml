@@ -106,3 +106,10 @@ jobs:
       - name: Install requirement dependencies
         working-directory: ./AiPerfTestAnalysis
         run: pip install -r requirements.txt
+
+      - name: Checking all files 
+        working-directory: ./AiPerfTestAnalysis/src/inputs
+        run: ls
+
+
+        
