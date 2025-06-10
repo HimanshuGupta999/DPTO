@@ -35,15 +35,8 @@ jobs:
       - name: Navigate to distributed-performance-testing
         working-directory: ./distributed-performance-testing
         run: echo "Entered project directory"
-
-      - name: Debug - show environment values (safe ones only)
-        working-directory: ./distributed-performance-testing
-        run: |
-          echo "JMETER_VERSION=${JMETER_VERSION}"
-          echo "MASTER_IP=${MASTER_IP}"
-          echo "NUMBER_OF_THREADS=${NUMBER_OF_THREADS}"
     
-      - name: Create .env file from secrets
+      - name: Create .env file inside distributed-performance-testing
         working-directory: ./distributed-performance-testing
         run: |
           cat <<EOF > .env
@@ -75,7 +68,7 @@ jobs:
         working-directory: ./distributed-performance-testing/src
         run: node index.js  
 
-      - name: Upload Test Artifacts (Logs & Statistics)
+      - name: Log & Statistics Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: distributed-test-results
@@ -89,7 +82,7 @@ jobs:
         run: |
           find ./distributed-performance-testing/test-files/ -type f -path "*/html_report*/statistics.json" -exec cp {} ./AiPerfTestAnalysis/src/inputs/ \; || echo "No statistics.json found"
 
-      - name: Create .env file from secrets
+      - name: Create .env file inside AiPerfTestAnalysis
         working-directory: ./AiPerfTestAnalysis
         run: |
           ls
@@ -99,7 +92,7 @@ jobs:
           PYTHONPATH=${PYTHONPATH}
           EOF
           
-      - name: Install python
+      - name: Check python & pip Version
         working-directory: ./AiPerfTestAnalysis
         run: |
           python3 --version
@@ -109,15 +102,15 @@ jobs:
         working-directory: ./AiPerfTestAnalysis
         run: pip install -r requirements.txt
 
-      - name: Checking all files inside folder
+      - name: Checking all files inside input folder
         working-directory: ./AiPerfTestAnalysis/src/inputs
         run: ls
 
-      - name: Run Python code 
+      - name: Run AIperf python code 
         working-directory: ./AiPerfTestAnalysis
         run: python3 app.py
 
-      - name: Upload Test Artifacts (Outputs)
+      - name: Recommedation Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: AI Perf Analysis recommendation file
