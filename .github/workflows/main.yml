@@ -109,7 +109,7 @@ jobs:
         working-directory: ./AiPerfTestAnalysis
         run: pip install -r requirements.txt
 
-      - name: Checking all files 
+      - name: Checking all files inside folder
         working-directory: ./AiPerfTestAnalysis/src/inputs
         run: ls
 
