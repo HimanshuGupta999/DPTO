@@ -7,9 +7,14 @@ const configureMaster = require('./remote/configureMaster');
 const runTestsOnSlaves = require('./remote/runTestsOnSlaves') ;
 const logger = require('./utility/logger');
 const installInfluxDB = require('./installation/influxDatabaseInstallation');
+const metrics = require('./utility/metrics');
+
 
 async function run() {
     try {
+        logger.info({ message: 'Logging system metrics BEFORE execution...' });
+        metrics.logSystemStats('Before execution');
+
         logger.info('Checking Java installation on master...');
         const masterJavaInstalled = await new Promise((resolve, reject) => {
             installation.checkJava(config.masterIp, (err, result) => {
@@ -178,6 +183,8 @@ async function run() {
             });
         }
 
+        logger.info('Starting continuous system metrics logging...');
+        metrics.startContinuousLogging(5000);
         logger.info('Running tests on slaves via master...');
         await new Promise((resolve, reject) => {
             runTestsOnSlaves.runTestsOnSlaves(config.masterIp, (err) => {
@@ -186,7 +193,8 @@ async function run() {
                 resolve();
             });
         });
-
+        logger.info('Stopping continuous system metrics logging...');
+        metrics.stopContinuousLogging();
         logger.info('Creating HTML report...');
         await new Promise((resolve, reject) => {
             runTestsOnSlaves.createHtmlReport(config.masterIp, (err) => {
@@ -205,6 +213,10 @@ async function run() {
                 });
             });
         }
+
+        logger.info('Logging system metrics AFTER execution...');
+        await metrics.logSystemStats('After execution');
+
         logger.info('Execution completed');
     } catch (error) {
         console.error('Error during execution:', error);
