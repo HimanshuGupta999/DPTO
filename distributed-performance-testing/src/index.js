@@ -1,4 +1,5 @@
 require('./utility/otel'); // Initialize OpenTelemetry
+require('dotenv').config();
 const config = require('../config/config');
 const installation = require('./installation/installation');
 const updateJMeterProperties = require('./remote/updateJmeterProperties');
@@ -8,12 +9,37 @@ const runTestsOnSlaves = require('./remote/runTestsOnSlaves') ;
 const logger = require('./utility/logger');
 const installInfluxDB = require('./installation/influxDatabaseInstallation');
 const metrics = require('./utility/metrics');
+const { collectRemoteMetrics } = require('./utility/remote-metrics');
 
+let metricsIntervalId;
+
+//The ip is used only for labeling/logging.
+
+async function logMetrics(label) {
+  for (const ip of [config.masterIp, ...config.slaveIps]) {
+    await collectRemoteMetrics(ip, config.sshPorts[ip], label);
+  }
+}
+
+function startMetricLoggingDuringExecution() {
+  metricsIntervalId = setInterval(async () => {
+    await logMetrics('During execution');
+  }, 5000); // every 5 seconds
+}
+
+function stopMetricLoggingDuringExecution() {
+  clearInterval(metricsIntervalId);
+  console.log('Stopped metrics logging');
+}
 
 async function run() {
     try {
-        logger.info({ message: 'Logging system metrics BEFORE execution...' });
-        metrics.logSystemStats('Before execution');
+        // logger.info({ message: 'Logging system metrics BEFORE execution...' });
+        // metrics.logSystemStats('Before execution');
+
+        console.log('Logging metrics BEFORE execution');
+        await logMetrics('Before execution');
+
 
         logger.info('Checking Java installation on master...');
         const masterJavaInstalled = await new Promise((resolve, reject) => {
@@ -183,8 +209,10 @@ async function run() {
             });
         }
 
-        logger.info('Starting continuous system metrics logging...');
-        metrics.startContinuousLogging(5000);
+        // logger.info('Starting continuous system metrics logging...');
+        // metrics.startContinuousLogging(5000);
+        startMetricLoggingDuringExecution();
+
         logger.info('Running tests on slaves via master...');
         await new Promise((resolve, reject) => {
             runTestsOnSlaves.runTestsOnSlaves(config.masterIp, (err) => {
@@ -193,8 +221,10 @@ async function run() {
                 resolve();
             });
         });
-        logger.info('Stopping continuous system metrics logging...');
-        metrics.stopContinuousLogging();
+        // logger.info('Stopping continuous system metrics logging...');
+        // metrics.stopContinuousLogging();
+        stopMetricLoggingDuringExecution();
+        
         logger.info('Creating HTML report...');
         await new Promise((resolve, reject) => {
             runTestsOnSlaves.createHtmlReport(config.masterIp, (err) => {
@@ -214,8 +244,11 @@ async function run() {
             });
         }
 
-        logger.info('Logging system metrics AFTER execution...');
-        await metrics.logSystemStats('After execution');
+        // logger.info('Logging system metrics AFTER execution...');
+        // await metrics.logSystemStats('After execution');
+        console.log('Logging metrics AFTER execution');
+        await logMetrics('After execution');
+
 
         logger.info('Execution completed');
     } catch (error) {

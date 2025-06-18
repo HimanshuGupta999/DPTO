@@ -5,7 +5,7 @@ class MetricsTransport extends Transport {
     constructor(opts) {
         super(opts);
         this.fileTransport = new winston.transports.File({
-            filename: 'metrics.log',
+            filename: 'remote-metrics.log',
             level: 'info',
             format: winston.format.combine(
                 winston.format.timestamp(),
