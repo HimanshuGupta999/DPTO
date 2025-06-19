@@ -16,4 +16,12 @@ module.exports = {
     influxDbOrg: process.env.INFLUXDB_ORG,
     influxDbBucket: process.env.INFLUXDB_BUCKET,
     influxDbToken: process.env.INFLUXDB_TOKEN,
+
+    //To map each container’s IP (used in .env) to its corresponding SSH port.
+    sshPorts: {
+    [process.env.MASTER_IP]: parseInt(process.env.SSH_PORT_MASTER, 10),
+    [process.env.SLAVE_IPS.split(',')[0]]: parseInt(process.env.SSH_PORT_SLAVE1, 10),
+    [process.env.SLAVE_IPS.split(',')[1]]: parseInt(process.env.SSH_PORT_SLAVE2, 10)
+  }
+
 };
