@@ -56,6 +56,11 @@ async function collectRemoteMetrics(ip, port, label) {
     });
 
     const commands = {
+        'Visible CPUs (cores)': `nproc`,
+        'Total Memory (GB)': `grep MemTotal /proc/meminfo | awk '{ printf "%.2f\\n", $2/1024/1024 }'`,
+        'Root Disk Size': `df -h / | awk 'NR==2 {print "Size:", $2, "Used:", $3, "Available:", $4, "Usage:", $5}'`,
+        'Disk Type': 'df -T /',
+
         'CPU Usage': `top -b -n1 | grep "Cpu(s)"`,
         'Memory Usage': `free -h`,
         'Disk Usage': `df -h /`
