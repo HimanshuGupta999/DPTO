@@ -40,7 +40,7 @@ async function run() {
         // metrics.logSystemStats('Before execution');
 
 
-        console.log('Logging container setup (CPU/memory limits and visibility)...');
+        logger.info('Logging container setup (CPU/memory limits and visibility)...');
         await logMetrics('Container Setup');
 
         // console.log('Logging metrics BEFORE execution');
@@ -253,7 +253,7 @@ async function run() {
         // await metrics.logSystemStats('After execution');
 
 
-        console.log('Logging metrics AFTER execution');
+        logger.info('Logging metrics AFTER execution');
         await logMetrics('After execution');
 
         logger.info('Execution completed');
