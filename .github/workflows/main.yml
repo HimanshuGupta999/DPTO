@@ -3,10 +3,10 @@ name: Distributed Load Test Pipeline
 on:
   push:
     branches:
-      - main
+      - feature/systemMetricsLog
   pull_request:
     branches:
-      - main
+      - feature/systemMetricsLog
 
 jobs:
   run-test:
