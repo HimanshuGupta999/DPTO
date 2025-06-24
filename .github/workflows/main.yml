@@ -68,6 +68,13 @@ jobs:
         working-directory: ./distributed-performance-testing/src
         run: node index.js  
 
+
+      - name: Jmeter lohg
+        uses: actions/upload-artifact@v4
+        with:
+          name: JMeter
+          path: ./distributed-performance-testing/src/
+
       - name: Check if remote-metrics.log exists
         working-directory: ./distributed-performance-testing/src
         run: |
@@ -81,13 +88,6 @@ jobs:
       - name: Copy remote-metrics.log file to AiPerfTestAnalysis/inputs
         run: |
           cp ./distributed-performance-testing/src/remote-metrics.log ./AiPerfTestAnalysis/src/
-
-
-      - name: Jmeter lohg
-        uses: actions/upload-artifact@v4
-        with:
-          name: JMeter
-          path: ./distributed-performance-testing/src/
 
       - name: Log & Statistics Artifacts
         uses: actions/upload-artifact@v4
