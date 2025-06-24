@@ -1,5 +1,6 @@
 require('./utility/otel'); // Initialize OpenTelemetry
 require('dotenv').config();
+
 const config = require('../config/config');
 const installation = require('./installation/installation');
 const updateJMeterProperties = require('./remote/updateJmeterProperties');
@@ -10,6 +11,7 @@ const logger = require('./utility/logger');
 const installInfluxDB = require('./installation/influxDatabaseInstallation');
 const metrics = require('./utility/metrics');
 const { collectRemoteMetrics } = require('./utility/remote-metrics');
+
 
 let metricsIntervalId;
 
@@ -37,12 +39,12 @@ async function run() {
         // logger.info({ message: 'Logging system metrics BEFORE execution...' });
         // metrics.logSystemStats('Before execution');
 
+
         console.log('Logging container setup (CPU/memory limits and visibility)...');
         await logMetrics('Container Setup');
 
-        console.log('Logging metrics BEFORE execution');
-        await logMetrics('Before execution');
-
+        // console.log('Logging metrics BEFORE execution');
+        // await logMetrics('Before execution');
 
         logger.info('Checking Java installation on master...');
         const masterJavaInstalled = await new Promise((resolve, reject) => {
@@ -227,7 +229,7 @@ async function run() {
         // logger.info('Stopping continuous system metrics logging...');
         // metrics.stopContinuousLogging();
         stopMetricLoggingDuringExecution();
-        
+
         logger.info('Creating HTML report...');
         await new Promise((resolve, reject) => {
             runTestsOnSlaves.createHtmlReport(config.masterIp, (err) => {
@@ -249,9 +251,10 @@ async function run() {
 
         // logger.info('Logging system metrics AFTER execution...');
         // await metrics.logSystemStats('After execution');
+
+
         console.log('Logging metrics AFTER execution');
         await logMetrics('After execution');
-
 
         logger.info('Execution completed');
     } catch (error) {
