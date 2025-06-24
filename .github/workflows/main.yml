@@ -71,6 +71,7 @@ jobs:
       - name: Check if remote-metrics.log exists
         working-directory: ./distributed-performance-testing/src
         run: |
+          ls
           if [ -f remote-metrics.log ]; then
             echo "File exists"
           else
