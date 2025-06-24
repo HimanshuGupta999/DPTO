@@ -3,10 +3,10 @@ name: Distributed Load Test Pipeline
 on:
   push:
     branches:
-      - feature/systemMetricsLog
+      - main
   pull_request:
     branches:
-      - feature/systemMetricsLog
+      - main
 
 jobs:
   run-test:
@@ -68,8 +68,7 @@ jobs:
         working-directory: ./distributed-performance-testing/src
         run: node index.js  
 
-
-      - name: Jmeter lohg
+      - name: Jmeter log
         uses: actions/upload-artifact@v4
         with:
           name: JMeter
