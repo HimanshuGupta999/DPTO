@@ -68,6 +68,26 @@ jobs:
         working-directory: ./distributed-performance-testing/src
         run: node index.js  
 
+      - name: Jmeter log
+        uses: actions/upload-artifact@v4
+        with:
+          name: JMeter
+          path: ./distributed-performance-testing/src/
+
+      - name: Check if remote-metrics.log exists
+        working-directory: ./distributed-performance-testing/src
+        run: |
+          ls
+          if [ -f remote-metrics.log ]; then
+            echo "File exists"
+          else
+            echo "File missing"; exit 1
+          fi
+
+      - name: Copy remote-metrics.log file to AiPerfTestAnalysis/inputs
+        run: |
+          cp ./distributed-performance-testing/src/remote-metrics.log ./AiPerfTestAnalysis/src/
+
       - name: Log & Statistics Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -91,7 +111,21 @@ jobs:
           GEMINI_API_KEY=${GEMINI_API_KEY}
           PYTHONPATH=${PYTHONPATH}
           EOF
+
+      - name: Extract Values from remote-metrics.log file
+        working-directory: ./AiPerfTestAnalysis/src/
+        run: |
+          CPU = $(jq -r 'select(.message.label == "Available CPUs (cores)") | .message.output' "remote-metrics.log" | head -1)
+          Memory = $(jq -r 'select(.message.label == "Total Memory (GB)") | .message.output' "remote-metrics.log" | head -1)
+          DiskType = $(jq -r 'select(.message.label == "Disk Type") | .message.output' "remote-metrics.log" | head -1)
+
+          echo "CPU=$CPU" >> ../.env
+          echo "Memory=${MEMORY}GB" >> ../.env
+          echo "DiskType=$DISK_TYPE" >> ../.env
           
+          echo "✅ Appended to ../.env file:"
+          cat ../.env
+
       - name: Check python & pip Version
         working-directory: ./AiPerfTestAnalysis
         run: |
