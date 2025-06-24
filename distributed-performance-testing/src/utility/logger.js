@@ -37,17 +37,16 @@ class MetricsTransport extends Transport {
     }
 
     log(info, callback) {
-        if (info.message && typeof info.message === 'object' && info.message.type === 'metrics') {
-            this.fileTransport.log(info, callback);
+    if (info.message && typeof info.message === 'object' && info.message.type === 'metrics') {
+        this.fileTransport.log(info, callback);
 
-            // ✅ Also log to console for visibility in CI/CD
-            const label = info.message.label || '';
-            const output = info.message.output || '';
-            const host = info.message.host || '';
-            console.log(`[REMOTE METRICS] ${label} ${host} :: ${output}`);
-        }
+        // Also log to console in CI for visibility
+        console.log(`[METRICS] ${info.message.label} - ${info.message.output || ''}`);
+    } else {
         callback();
     }
+}
+
 }
 
 
