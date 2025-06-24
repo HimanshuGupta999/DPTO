@@ -39,6 +39,8 @@ async function run() {
         // logger.info({ message: 'Logging system metrics BEFORE execution...' });
         // metrics.logSystemStats('Before execution');
 
+        console.log('Start console Logging')
+        logger.info('Start logger Logging')
 
         logger.info('Logging container setup (CPU/memory limits and visibility)...');
         await logMetrics('Container Setup');
