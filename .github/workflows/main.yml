@@ -132,22 +132,19 @@ jobs:
           
       - name: Inject CPU, Memory, DiskType into test_config.json
         run: |
+          CLEAN_MEMORY=$(echo "$Memory" | sed 's/GB//')
+
           jq --arg cpu "$CPU" \
-            --arg memory "$Memory" \
+            --arg memory "$CLEAN_MEMORY" \
             --arg disktype "$DiskType" \
             '.context.infra.cpu_cores_per_node = ($cpu | tonumber) |
               .context.infra.memory_gb_per_node = ($memory | tonumber) |
               .context.infra.disk_type = $disktype' \
             ./AiPerfTestAnalysis/src/inputs/test_config.json > tmp.json && mv tmp.json ./AiPerfTestAnalysis/src/inputs/test_config.json
 
-            echo "✅ Updated test_config.json:"
-            cat ./AiPerfTestAnalysis/src/inputs/test_config.json
+          echo "✅ Updated test_config.json:"
+          cat ./AiPerfTestAnalysis/src/inputs/test_config.json
       
-      - name: Extract Values from remote-metrics.log file
-        working-directory: ./AiPerfTestAnalysis/src/inputs/
-        run: |
-          cat test_config.json
-
       - name: Check python & pip Version
         working-directory: ./AiPerfTestAnalysis
         run: |
