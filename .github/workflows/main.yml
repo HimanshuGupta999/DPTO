@@ -108,38 +108,41 @@ jobs:
         run: |
           find ./distributed-performance-testing/test-files/ -type f -path "*/html_report*/statistics.json" -exec cp {} ./AiPerfTestAnalysis/src/inputs/ \; || echo "No statistics.json found"
 
-      - name: Create base .env file inside AiPerfTestAnalysis
+      - name: Create .env file inside AiPerfTestAnalysis
         working-directory: ./AiPerfTestAnalysis
         run: |
-          echo "Creating base .env file"
-          {
-            echo "GEMINI_MODEL_ID=${GEMINI_MODEL_ID}"
-            echo "GEMINI_API_KEY=${GEMINI_API_KEY}"
-            echo "PYTHONPATH=${PYTHONPATH}"
-          } > .env
+          ls
+          cat <<EOF > .env
+          GEMINI_MODEL_ID=${GEMINI_MODEL_ID}
+          GEMINI_API_KEY=${GEMINI_API_KEY}
+          PYTHONPATH=${PYTHONPATH}
+          EOF
 
-          echo "✅ Base .env created:"
-          cat .env
-
-      - name: Extract Values from remote-metrics.log file and append to .env
+      - name: Extract Values from remote-metrics.log file
         working-directory: ./AiPerfTestAnalysis/src/inputs/
         run: |
-          echo "Extracting CPU, Memory, DiskType from remote-metrics.log..."
+          ls
+          CPU=$(jq -r 'select(.message.label == "Available CPUs (cores)") | .message.output' "remote-metrics.log" | head -1)
+          Memory=$(jq -r 'select(.message.label == "Total Memory (GB)") | .message.output' "remote-metrics.log" | head -1)
+          DiskType=$(jq -r 'select(.message.label == "Disk Type") | .message.output' "remote-metrics.log" | head -1)
 
-          CPU=$(jq -r 'select(.message.label == "Available CPUs (cores)") | .message.output' remote-metrics.log | head -1)
-          MEMORY=$(jq -r 'select(.message.label == "Total Memory (GB)") | .message.output' remote-metrics.log | head -1)
-          DISK_TYPE=$(jq -r 'select(.message.label == "Disk Type") | .message.output' remote-metrics.log | head -1)
+          echo "CPU=$CPU" >> $GITHUB_ENV
+          echo "Memory=${Memory}GB" >> $GITHUB_ENV
+          echo "DiskType=$DiskType" >> $GITHUB_ENV
+          
+      - name: Inject CPU, Memory, DiskType into test_config.json
+        run: |
+          jq --arg cpu "$CPU" \
+            --arg memory "$Memory" \
+            --arg disktype "$DiskType" \
+            '.context.infra.cpu_cores_per_node = ($cpu | tonumber) |
+              .context.infra.memory_gb_per_node = ($memory | tonumber) |
+              .context.infra.disk_type = $disktype' \
+            ./AiPerfTestAnalysis/src/inputs/test_config.json > tmp.json && mv tmp.json ./AiPerfTestAnalysis/src/inputs/test_config.json
 
-          echo "CPU=$CPU" >> ../.env
-          echo "Memory=${MEMORY}GB" >> ../.env
-          echo "DiskType=$DISK_TYPE" >> ../.env
-
-          echo "✅ Appended new values to .env:"
-          cat ../.env
-
-      - name: Show final .env file
-        run: cat ./AiPerfTestAnalysis/.env
-
+            echo "✅ Updated test_config.json:"
+            cat ./AiPerfTestAnalysis/src/inputs/test_config.json
+      
       - name: Check python & pip Version
         working-directory: ./AiPerfTestAnalysis
         run: |
