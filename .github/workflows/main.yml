@@ -143,6 +143,11 @@ jobs:
             echo "✅ Updated test_config.json:"
             cat ./AiPerfTestAnalysis/src/inputs/test_config.json
       
+      - name: Extract Values from remote-metrics.log file
+        working-directory: ./AiPerfTestAnalysis/src/inputs/
+        run: |
+          cat test_config.json
+
       - name: Check python & pip Version
         working-directory: ./AiPerfTestAnalysis
         run: |
