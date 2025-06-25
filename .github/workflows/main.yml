@@ -119,7 +119,7 @@ jobs:
           EOF
 
       - name: Extract Values from remote-metrics.log file
-        working-directory: ./AiPerfTestAnalysis/src/
+        working-directory: ./AiPerfTestAnalysis/src/inputs/
         run: |
           CPU = $(jq -r 'select(.message.label == "Available CPUs (cores)") | .message.output' "remote-metrics.log" | head -1)
           Memory = $(jq -r 'select(.message.label == "Total Memory (GB)") | .message.output' "remote-metrics.log" | head -1)
