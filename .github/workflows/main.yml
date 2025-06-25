@@ -108,32 +108,36 @@ jobs:
         run: |
           find ./distributed-performance-testing/test-files/ -type f -path "*/html_report*/statistics.json" -exec cp {} ./AiPerfTestAnalysis/src/inputs/ \; || echo "No statistics.json found"
 
-      - name: Create .env file inside AiPerfTestAnalysis
+      - name: Create base .env file inside AiPerfTestAnalysis
         working-directory: ./AiPerfTestAnalysis
         run: |
-          ls
-          cat <<EOF > .env
-          GEMINI_MODEL_ID=${GEMINI_MODEL_ID}
-          GEMINI_API_KEY=${GEMINI_API_KEY}
-          PYTHONPATH=${PYTHONPATH}
-          EOF
+          echo "Creating base .env file"
+          {
+            echo "GEMINI_MODEL_ID=${GEMINI_MODEL_ID}"
+            echo "GEMINI_API_KEY=${GEMINI_API_KEY}"
+            echo "PYTHONPATH=${PYTHONPATH}"
+          } > .env
 
-      - name: Extract Values from remote-metrics.log file
+          echo "✅ Base .env created:"
+          cat .env
+
+      - name: Extract Values from remote-metrics.log file and append to .env
         working-directory: ./AiPerfTestAnalysis/src/inputs/
         run: |
-          ls
-          CPU=$(jq -r 'select(.message.label == "Available CPUs (cores)") | .message.output' "remote-metrics.log" | head -1)
-          Memory=$(jq -r 'select(.message.label == "Total Memory (GB)") | .message.output' "remote-metrics.log" | head -1)
-          DiskType=$(jq -r 'select(.message.label == "Disk Type") | .message.output' "remote-metrics.log" | head -1)
+          echo "Extracting CPU, Memory, DiskType from remote-metrics.log..."
+
+          CPU=$(jq -r 'select(.message.label == "Available CPUs (cores)") | .message.output' remote-metrics.log | head -1)
+          MEMORY=$(jq -r 'select(.message.label == "Total Memory (GB)") | .message.output' remote-metrics.log | head -1)
+          DISK_TYPE=$(jq -r 'select(.message.label == "Disk Type") | .message.output' remote-metrics.log | head -1)
 
           echo "CPU=$CPU" >> ../.env
-          echo "Memory=${Memory}GB" >> ../.env
-          echo "DiskType=$DiskType" >> ../.env
-          
-          echo "✅ Appended to ../.env file:"
+          echo "Memory=${MEMORY}GB" >> ../.env
+          echo "DiskType=$DISK_TYPE" >> ../.env
+
+          echo "✅ Appended new values to .env:"
           cat ../.env
 
-      - name: Show contents of remote-metrics.log
+      - name: Show final .env file
         run: cat ./AiPerfTestAnalysis/.env
 
       - name: Check python & pip Version
