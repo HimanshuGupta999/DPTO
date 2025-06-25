@@ -121,6 +121,7 @@ jobs:
       - name: Extract Values from remote-metrics.log file
         working-directory: ./AiPerfTestAnalysis/src/inputs/
         run: |
+          ls
           CPU = $(jq -r 'select(.message.label == "Available CPUs (cores)") | .message.output' "remote-metrics.log" | head -1)
           Memory = $(jq -r 'select(.message.label == "Total Memory (GB)") | .message.output' "remote-metrics.log" | head -1)
           DiskType = $(jq -r 'select(.message.label == "Disk Type") | .message.output' "remote-metrics.log" | head -1)
