@@ -92,7 +92,7 @@ jobs:
 
       - name: Copy remote-metrics.log file to AiPerfTestAnalysis/inputs
         run: |
-          cp ./distributed-performance-testing/src/remote-metrics.log ./AiPerfTestAnalysis/src/
+          cp ./distributed-performance-testing/src/remote-metrics.log ./AiPerfTestAnalysis/src/inputs/
 
       - name: Log & Statistics Artifacts
         uses: actions/upload-artifact@v4
