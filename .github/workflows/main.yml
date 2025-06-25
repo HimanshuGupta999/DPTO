@@ -127,11 +127,14 @@ jobs:
           DiskType=$(jq -r 'select(.message.label == "Disk Type") | .message.output' "remote-metrics.log" | head -1)
 
           echo "CPU=$CPU" >> ../.env
-          echo "Memory=${MEMORY}GB" >> ../.env
-          echo "DiskType=$DISK_TYPE" >> ../.env
+          echo "Memory=${Memory}GB" >> ../.env
+          echo "DiskType=$DiskType" >> ../.env
           
           echo "✅ Appended to ../.env file:"
           cat ../.env
+
+      - name: Show contents of remote-metrics.log
+        run: cat ./AiPerfTestAnalysis/.env
 
       - name: Check python & pip Version
         working-directory: ./AiPerfTestAnalysis
