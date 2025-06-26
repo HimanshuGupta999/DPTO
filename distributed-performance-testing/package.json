@@ -14,6 +14,7 @@
     "@opentelemetry/semantic-conventions": "^1.28.0",
     "dotenv": "^16.4.7",
     "ssh2": "^1.16.0",
-    "winston": "^3.17.0"
+    "winston": "^3.17.0",
+    "winston-transport": "^4.9.0"
   }
 }

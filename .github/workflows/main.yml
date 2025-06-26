@@ -20,6 +20,9 @@ jobs:
       SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
       SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
       TEST_PLAN_PATH: ${{ secrets.TEST_PLAN_PATH }}
+      SSH_PORT_MASTER: ${{ secrets.SSH_PORT_MASTER }}
+      SSH_PORT_SLAVE1: ${{ secrets.SSH_PORT_SLAVE1 }}
+      SSH_PORT_SLAVE2: ${{ secrets.SSH_PORT_SLAVE2 }}
       RESULT_PATH: ${{ secrets.RESULT_PATH }}
       NUMBER_OF_THREADS: ${{ secrets.NUMBER_OF_THREADS }}
       GEMINI_MODEL_ID: ${{ secrets.GEMINI_MODEL_ID }}
@@ -49,6 +52,9 @@ jobs:
           TEST_PLAN_PATH=${TEST_PLAN_PATH}
           RESULT_PATH=${RESULT_PATH}
           NUMBER_OF_THREADS=${NUMBER_OF_THREADS}
+          SSH_PORT_MASTER=${SSH_PORT_MASTER}
+          SSH_PORT_SLAVE1=${SSH_PORT_SLAVE1}
+          SSH_PORT_SLAVE2=${SSH_PORT_SLAVE2}
           EOF
           
       - name: Install npm dependencies
@@ -67,6 +73,20 @@ jobs:
       - name: Run node index.js
         working-directory: ./distributed-performance-testing/src
         run: node index.js  
+
+      - name: Check if remote-metrics.log exists
+        working-directory: ./distributed-performance-testing/src
+        run: |
+          ls
+          if [ -f remote-metrics.log ]; then
+            echo "File exists"
+          else
+            echo "File missing"; exit 1
+          fi
+
+      - name: Copy remote-metrics.log file to AiPerfTestAnalysis/inputs
+        run: |
+          cp ./distributed-performance-testing/src/remote-metrics.log ./AiPerfTestAnalysis/src/inputs/
 
       - name: Log & Statistics Artifacts
         uses: actions/upload-artifact@v4
@@ -91,7 +111,34 @@ jobs:
           GEMINI_API_KEY=${GEMINI_API_KEY}
           PYTHONPATH=${PYTHONPATH}
           EOF
+
+      - name: Extract Values from remote-metrics.log file
+        working-directory: ./AiPerfTestAnalysis/src/inputs/
+        run: |
+          ls
+          CPU=$(jq -r 'select(.message.label == "Available CPUs (cores)") | .message.output' "remote-metrics.log" | head -1)
+          Memory=$(jq -r 'select(.message.label == "Total Memory (GB)") | .message.output' "remote-metrics.log" | head -1)
+          DiskType=$(jq -r 'select(.message.label == "Disk Type") | .message.output' "remote-metrics.log" | head -1)
+
+          echo "CPU=$CPU" >> $GITHUB_ENV
+          echo "Memory=${Memory}GB" >> $GITHUB_ENV
+          echo "DiskType=$DiskType" >> $GITHUB_ENV
           
+      - name: Inject CPU, Memory, DiskType into test_config.json
+        run: |
+          CLEAN_MEMORY=$(echo "$Memory" | sed 's/GB//')
+
+          jq --arg cpu "$CPU" \
+            --arg memory "$CLEAN_MEMORY" \
+            --arg disktype "$DiskType" \
+            '.context.infra.cpu_cores_per_node = ($cpu | tonumber) |
+              .context.infra.memory_gb_per_node = ($memory | tonumber) |
+              .context.infra.disk_type = $disktype' \
+            ./AiPerfTestAnalysis/src/inputs/test_config.json > tmp.json && mv tmp.json ./AiPerfTestAnalysis/src/inputs/test_config.json
+
+          echo "Updated test_config.json"
+          cat ./AiPerfTestAnalysis/src/inputs/test_config.json
+      
       - name: Check python & pip Version
         working-directory: ./AiPerfTestAnalysis
         run: |
