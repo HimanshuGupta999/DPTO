@@ -55,7 +55,7 @@ GRAFANA_ADMIN_PASSWORD=<GRAFANA_PASSWORD>
 APPLICATION_NAME=<APPLICATION_NAME>
 ```
 # Project Structure
-
+```env
 INFLUX_GRAFANA/
 ├── distributed-performance-testing/
 │   ├── config/
@@ -88,7 +88,7 @@ INFLUX_GRAFANA/
 │   ├── .env.template
 │   ├── README.md
 
-
+```
 
 ## 📦 Installation
 
