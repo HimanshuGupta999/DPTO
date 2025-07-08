@@ -53,7 +53,7 @@ GRAFANA_ADMIN_PASSWORD=<GRAFANA_PASSWORD>
 
 # Application Name (used in InfluxDB tags)
 APPLICATION_NAME=<APPLICATION_NAME>
-
+```
 # Project Structure
 
 INFLUX_GRAFANA/
@@ -100,13 +100,17 @@ Clone the repository to your local machine:
 git clone <repo>
 cd distributed-performance-testing
 
+```
+
 ### 2. Configure Environment Variables
  
  Copy the .env.template file to .env and modify the variables as per your setup:
 
 ```bash
 cp .env.template .env
+
 nano .env
+
 ```
 Update details like:
 
