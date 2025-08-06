@@ -16,6 +16,11 @@ module.exports = {
     influxDbOrg: process.env.INFLUXDB_ORG,
     influxDbBucket: process.env.INFLUXDB_BUCKET,
     influxDbToken: process.env.INFLUXDB_TOKEN,
+    influxDbUrl: `http://influxdb:8086`,
+    applicationName: process.env.APPLICATION_NAME || 'jmeter_app',
+    grafanaUser: process.env.GRAFANA_ADMIN_USER,
+    grafanaPassword: process.env.RAFANA_ADMIN_PASSWORD,
+
 
     //To map each container’s IP (used in .env) to its corresponding SSH port.
     sshPorts: {

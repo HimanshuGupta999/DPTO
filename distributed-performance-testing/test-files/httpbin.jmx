@@ -33,7 +33,7 @@
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report">
+          <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
             <boolProp name="ResultCollector.error_logging">false</boolProp>
             <objProp>
               <name>saveConfig</name>
@@ -70,7 +70,7 @@
             <stringProp name="filename"></stringProp>
           </ResultCollector>
           <hashTree/>
-          <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table">
+          <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="true">
             <boolProp name="ResultCollector.error_logging">false</boolProp>
             <objProp>
               <name>saveConfig</name>
@@ -107,7 +107,7 @@
             <stringProp name="filename">/home/nashtech/Downloads/PerfAI Test/HttpBinReports/ViewResultsInTable.csv</stringProp>
           </ResultCollector>
           <hashTree/>
-          <BeanShellAssertion guiclass="BeanShellAssertionGui" testclass="BeanShellAssertion" testname="BeanShell Assertion">
+          <BeanShellAssertion guiclass="BeanShellAssertionGui" testclass="BeanShellAssertion" testname="BeanShell Assertion" enabled="true">
             <stringProp name="BeanShellAssertion.query">if (!ResponseCode.matches(&quot;200|201|204|301|302&quot;)) { 
     log.error(&quot;ERROR: Request failed! &quot; + SampleLabel + 
               &quot; | Response Code: &quot; + ResponseCode + 
@@ -121,7 +121,7 @@
             <boolProp name="BeanShellAssertion.resetInterpreter">false</boolProp>
           </BeanShellAssertion>
           <hashTree/>
-          <ResultCollector guiclass="SimpleDataWriter" testclass="ResultCollector" testname="Simple Data Writer">
+          <ResultCollector guiclass="SimpleDataWriter" testclass="ResultCollector" testname="Simple Data Writer" enabled="true">
             <boolProp name="ResultCollector.error_logging">false</boolProp>
             <objProp>
               <name>saveConfig</name>
@@ -157,6 +157,69 @@
             </objProp>
             <stringProp name="filename">/home/nashtech/Downloads/PerfAI Test/HttpBinReports/SimpleDataWriter.csv</stringProp>
           </ResultCollector>
+          <hashTree/>
+          <BackendListener guiclass="BackendListenerGui" testclass="BackendListener" testname="Backend Listener" enabled="true">
+            <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="influxdbMetricsSender" elementType="Argument">
+                  <stringProp name="Argument.name">influxdbMetricsSender</stringProp>
+                  <stringProp name="Argument.value">org.apache.jmeter.visualizers.backend.influxdb.HttpMetricsSender</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="influxdbUrl" elementType="Argument">
+                  <stringProp name="Argument.name">influxdbUrl</stringProp>
+                  <stringProp name="Argument.value">http://influxdb:8086/api/v2/write?org=jmeter-org-Influx&amp;bucket=jmeter_bucket&amp;precision=ms</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="application" elementType="Argument">
+                  <stringProp name="Argument.name">application</stringProp>
+                  <stringProp name="Argument.value">distributed_perf_testing</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="measurement" elementType="Argument">
+                  <stringProp name="Argument.name">measurement</stringProp>
+                  <stringProp name="Argument.value">jmeter</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="summaryOnly" elementType="Argument">
+                  <stringProp name="Argument.name">summaryOnly</stringProp>
+                  <stringProp name="Argument.value">false</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="samplersRegex" elementType="Argument">
+                  <stringProp name="Argument.name">samplersRegex</stringProp>
+                  <stringProp name="Argument.value">.*</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="percentiles" elementType="Argument">
+                  <stringProp name="Argument.name">percentiles</stringProp>
+                  <stringProp name="Argument.value">90;95;99</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="testTitle" elementType="Argument">
+                  <stringProp name="Argument.name">testTitle</stringProp>
+                  <stringProp name="Argument.value">Jmeter_test</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="eventTags" elementType="Argument">
+                  <stringProp name="Argument.name">eventTags</stringProp>
+                  <stringProp name="Argument.value"></stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="influxdbToken" elementType="Argument">
+                  <stringProp name="Argument.name">influxdbToken</stringProp>
+                  <stringProp name="Argument.value">9_byYbUYL7HSXQKkyEuWrdal6q68uyW_Oub2NcS9ej3RTyZsX1ca_7V9C8rYJoq32j8pSNQAszp747UhLdrkTg==</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="influxdbOrg" elementType="Argument">
+                  <stringProp name="Argument.name">influxdbOrg</stringProp>
+                  <stringProp name="Argument.value">jmeter-org-Influx</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="classname">org.apache.jmeter.visualizers.backend.influxdb.InfluxdbBackendListenerClient</stringProp>
+          </BackendListener>
           <hashTree/>
         </hashTree>
       </hashTree>

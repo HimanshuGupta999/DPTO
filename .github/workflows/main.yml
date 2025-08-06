@@ -3,10 +3,10 @@ name: Distributed Load Test Pipeline
 on:
   push:
     branches:
-      - main
+      - feature/InfluxCode
   pull_request:
     branches:
-      - main
+      - feature/InfluxCode
 
   workflow_dispatch:  # Enables trigger
 
@@ -30,6 +30,15 @@ jobs:
       GEMINI_MODEL_ID: ${{ secrets.GEMINI_MODEL_ID }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       PYTHONPATH: ${{ secrets.PYTHONPATH }}
+      APPLICATION_NAME: ${{ secrets.APPLICATION_NAME }}
+      GRAFANA_ADMIN_USER: ${{ secrets.GRAFANA_ADMIN_USER }}
+      GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+      INFLUXDB_ADMIN_USER: ${{ secrets.INFLUXDB_ADMIN_USER }}
+      INFLUXDB_ADMIN_PASSWORD: ${{ secrets.INFLUXDB_ADMIN_PASSWORD }}
+      INFLUXDB_BUCKET: ${{ secrets.INFLUXDB_BUCKET }}
+      INFLUXDB_ORG: ${{ secrets.INFLUXDB_ORG }}
+      INFLUXDB_TOKEN: ${{ secrets.INFLUXDB_TOKEN }}
+      INFLUXDB_URL: ${{ secrets.INFLUXDB_URL }}
 
     steps:
       - name: Checkout code
@@ -57,6 +66,15 @@ jobs:
           SSH_PORT_MASTER=${SSH_PORT_MASTER}
           SSH_PORT_SLAVE1=${SSH_PORT_SLAVE1}
           SSH_PORT_SLAVE2=${SSH_PORT_SLAVE2}
+          INFLUXDB_ADMIN_USER=${INFLUXDB_ADMIN_USER}
+          INFLUXDB_ADMIN_PASSWORD=${INFLUXDB_ADMIN_PASSWORD}
+          INFLUXDB_URL=${INFLUXDB_URL}
+          INFLUXDB_TOKEN=${INFLUXDB_TOKEN}
+          INFLUXDB_BUCKET=${INFLUXDB_BUCKET}
+          INFLUXDB_ORG=${INFLUXDB_ORG}
+          APPLICATION_NAME=${APPLICATION_NAME}
+          GRAFANA_ADMIN_USER=${GRAFANA_ADMIN_USER}
+          GRAFANA_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
           EOF
           
       - name: Install npm dependencies
@@ -96,71 +114,71 @@ jobs:
           name: distributed-test-results
           path: ./distributed-performance-testing/test-files/
 
-      - name: Copy logs files to AiPerfTestAnalysis/inputs
-        run: |
-          cp ./distributed-performance-testing/test-files/*.log ./AiPerfTestAnalysis/src/inputs/
+      # - name: Copy logs files to AiPerfTestAnalysis/inputs
+      #   run: |
+      #     cp ./distributed-performance-testing/test-files/*.log ./AiPerfTestAnalysis/src/inputs/
 
-      - name: Copy statistics files to AiPerfTestAnalysis/inputs
-        run: |
-          find ./distributed-performance-testing/test-files/ -type f -path "*/html_report*/statistics.json" -exec cp {} ./AiPerfTestAnalysis/src/inputs/ \; || echo "No statistics.json found"
+      # - name: Copy statistics files to AiPerfTestAnalysis/inputs
+      #   run: |
+      #     find ./distributed-performance-testing/test-files/ -type f -path "*/html_report*/statistics.json" -exec cp {} ./AiPerfTestAnalysis/src/inputs/ \; || echo "No statistics.json found"
 
-      - name: Create .env file inside AiPerfTestAnalysis
-        working-directory: ./AiPerfTestAnalysis
-        run: |
-          ls
-          cat <<EOF > .env
-          GEMINI_MODEL_ID=${GEMINI_MODEL_ID}
-          GEMINI_API_KEY=${GEMINI_API_KEY}
-          PYTHONPATH=${PYTHONPATH}
-          EOF
+      # - name: Create .env file inside AiPerfTestAnalysis
+      #   working-directory: ./AiPerfTestAnalysis
+      #   run: |
+      #     ls
+      #     cat <<EOF > .env
+      #     GEMINI_MODEL_ID=${GEMINI_MODEL_ID}
+      #     GEMINI_API_KEY=${GEMINI_API_KEY}
+      #     PYTHONPATH=${PYTHONPATH}
+      #     EOF
 
-      - name: Extract Values from remote-metrics.log file
-        working-directory: ./AiPerfTestAnalysis/src/inputs/
-        run: |
-          ls
-          CPU=$(jq -r 'select(.message.label == "Available CPUs (cores)") | .message.output' "remote-metrics.log" | head -1)
-          Memory=$(jq -r 'select(.message.label == "Total Memory (GB)") | .message.output' "remote-metrics.log" | head -1)
-          DiskType=$(jq -r 'select(.message.label == "Disk Type") | .message.output' "remote-metrics.log" | head -1)
+      # - name: Extract Values from remote-metrics.log file
+      #   working-directory: ./AiPerfTestAnalysis/src/inputs/
+      #   run: |
+      #     ls
+      #     CPU=$(jq -r 'select(.message.label == "Available CPUs (cores)") | .message.output' "remote-metrics.log" | head -1)
+      #     Memory=$(jq -r 'select(.message.label == "Total Memory (GB)") | .message.output' "remote-metrics.log" | head -1)
+      #     DiskType=$(jq -r 'select(.message.label == "Disk Type") | .message.output' "remote-metrics.log" | head -1)
 
-          echo "CPU=$CPU" >> $GITHUB_ENV
-          echo "Memory=${Memory}GB" >> $GITHUB_ENV
-          echo "DiskType=$DiskType" >> $GITHUB_ENV
+      #     echo "CPU=$CPU" >> $GITHUB_ENV
+      #     echo "Memory=${Memory}GB" >> $GITHUB_ENV
+      #     echo "DiskType=$DiskType" >> $GITHUB_ENV
           
-      - name: Inject CPU, Memory, DiskType into test_config.json
-        run: |
-          CLEAN_MEMORY=$(echo "$Memory" | sed 's/GB//')
+      # - name: Inject CPU, Memory, DiskType into test_config.json
+      #   run: |
+      #     CLEAN_MEMORY=$(echo "$Memory" | sed 's/GB//')
 
-          jq --arg cpu "$CPU" \
-            --arg memory "$CLEAN_MEMORY" \
-            --arg disktype "$DiskType" \
-            '.context.infra.cpu_cores_per_node = ($cpu | tonumber) |
-              .context.infra.memory_gb_per_node = ($memory | tonumber) |
-              .context.infra.disk_type = $disktype' \
-            ./AiPerfTestAnalysis/src/inputs/test_config.json > tmp.json && mv tmp.json ./AiPerfTestAnalysis/src/inputs/test_config.json
+      #     jq --arg cpu "$CPU" \
+      #       --arg memory "$CLEAN_MEMORY" \
+      #       --arg disktype "$DiskType" \
+      #       '.context.infra.cpu_cores_per_node = ($cpu | tonumber) |
+      #         .context.infra.memory_gb_per_node = ($memory | tonumber) |
+      #         .context.infra.disk_type = $disktype' \
+      #       ./AiPerfTestAnalysis/src/inputs/test_config.json > tmp.json && mv tmp.json ./AiPerfTestAnalysis/src/inputs/test_config.json
 
-          echo "Updated test_config.json"
-          cat ./AiPerfTestAnalysis/src/inputs/test_config.json
+      #     echo "Updated test_config.json"
+      #     cat ./AiPerfTestAnalysis/src/inputs/test_config.json
       
-      - name: Check python & pip Version
-        working-directory: ./AiPerfTestAnalysis
-        run: |
-          python3 --version
-          pip --version
+      # - name: Check python & pip Version
+      #   working-directory: ./AiPerfTestAnalysis
+      #   run: |
+      #     python3 --version
+      #     pip --version
 
-      - name: Install requirement dependencies
-        working-directory: ./AiPerfTestAnalysis
-        run: pip install -r requirements.txt
+      # - name: Install requirement dependencies
+      #   working-directory: ./AiPerfTestAnalysis
+      #   run: pip install -r requirements.txt
 
-      - name: Checking all files inside input folder
-        working-directory: ./AiPerfTestAnalysis/src/inputs
-        run: ls
+      # - name: Checking all files inside input folder
+      #   working-directory: ./AiPerfTestAnalysis/src/inputs
+      #   run: ls
 
-      - name: Run AIperf python code 
-        working-directory: ./AiPerfTestAnalysis
-        run: python3 app.py
+      # - name: Run AIperf python code 
+      #   working-directory: ./AiPerfTestAnalysis
+      #   run: python3 app.py
 
-      - name: Recommedation Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: AI Perf Analysis recommendation file
-          path: ./AiPerfTestAnalysis/src/outputs
+      # - name: Recommedation Artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: AI Perf Analysis recommendation file
+      #     path: ./AiPerfTestAnalysis/src/outputs
