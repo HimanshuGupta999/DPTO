@@ -4,11 +4,11 @@ datasources:
   - name: InfluxDB
     type: influxdb
     access: proxy
-    isDefault: false
+    isDefault: true
     jsonData:
       version: Flux
-      organization: jmeter-org-Influx
+      organization: test_org
       defaultBucket: jmeter_bucket
     secureJsonData:
-      token: 9_byYbUYL7HSXQKkyEuWrdal6q68uyW_Oub2NcS9ej3RTyZsX1ca_7V9C8rYJoq32j8pSNQAszp747UhLdrkTg==
+      token: 5rX2uEJgCoEhIYU0C71aWY8XEJpu8J38LQUA2GKg43evoSEFF2vUup3ite0K_vCxb9p2GobGIxeaknJPIo5ssQ==
     url: http://influxdb:8086

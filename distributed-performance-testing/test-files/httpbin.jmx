@@ -158,7 +158,7 @@
             <stringProp name="filename">/home/nashtech/Downloads/PerfAI Test/HttpBinReports/SimpleDataWriter.csv</stringProp>
           </ResultCollector>
           <hashTree/>
-          <BackendListener guiclass="BackendListenerGui" testclass="BackendListener" testname="Backend Listener" enabled="true">
+          <BackendListener guiclass="BackendListenerGui" testclass="BackendListener" testname="Backend Listener">
             <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments">
               <collectionProp name="Arguments.arguments">
                 <elementProp name="influxdbMetricsSender" elementType="Argument">
@@ -168,12 +168,12 @@
                 </elementProp>
                 <elementProp name="influxdbUrl" elementType="Argument">
                   <stringProp name="Argument.name">influxdbUrl</stringProp>
-                  <stringProp name="Argument.value">http://influxdb:8086/api/v2/write?org=jmeter-org-Influx&amp;bucket=jmeter_bucket&amp;precision=ms</stringProp>
+                  <stringProp name="Argument.value">http://influxdb:8086/api/v2/write?org=test_org&amp;bucket=jmeter_bucket&amp;precision=ns</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
-                <elementProp name="application" elementType="Argument">
-                  <stringProp name="Argument.name">application</stringProp>
-                  <stringProp name="Argument.value">distributed_perf_testing</stringProp>
+                <elementProp name="influxdbToken" elementType="Argument">
+                  <stringProp name="Argument.name">influxdbToken</stringProp>
+                  <stringProp name="Argument.value">5rX2uEJgCoEhIYU0C71aWY8XEJpu8J38LQUA2GKg43evoSEFF2vUup3ite0K_vCxb9p2GobGIxeaknJPIo5ssQ==</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
                 <elementProp name="measurement" elementType="Argument">
@@ -181,44 +181,29 @@
                   <stringProp name="Argument.value">jmeter</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
-                <elementProp name="summaryOnly" elementType="Argument">
-                  <stringProp name="Argument.name">summaryOnly</stringProp>
-                  <stringProp name="Argument.value">false</stringProp>
-                  <stringProp name="Argument.metadata">=</stringProp>
-                </elementProp>
-                <elementProp name="samplersRegex" elementType="Argument">
-                  <stringProp name="Argument.name">samplersRegex</stringProp>
-                  <stringProp name="Argument.value">.*</stringProp>
-                  <stringProp name="Argument.metadata">=</stringProp>
-                </elementProp>
-                <elementProp name="percentiles" elementType="Argument">
-                  <stringProp name="Argument.name">percentiles</stringProp>
-                  <stringProp name="Argument.value">90;95;99</stringProp>
-                  <stringProp name="Argument.metadata">=</stringProp>
-                </elementProp>
-                <elementProp name="testTitle" elementType="Argument">
-                  <stringProp name="Argument.name">testTitle</stringProp>
-                  <stringProp name="Argument.value">Jmeter_test</stringProp>
-                  <stringProp name="Argument.metadata">=</stringProp>
-                </elementProp>
-                <elementProp name="eventTags" elementType="Argument">
-                  <stringProp name="Argument.name">eventTags</stringProp>
-                  <stringProp name="Argument.value"></stringProp>
-                  <stringProp name="Argument.metadata">=</stringProp>
-                </elementProp>
-                <elementProp name="influxdbToken" elementType="Argument">
-                  <stringProp name="Argument.name">influxdbToken</stringProp>
-                  <stringProp name="Argument.value">9_byYbUYL7HSXQKkyEuWrdal6q68uyW_Oub2NcS9ej3RTyZsX1ca_7V9C8rYJoq32j8pSNQAszp747UhLdrkTg==</stringProp>
-                  <stringProp name="Argument.metadata">=</stringProp>
-                </elementProp>
                 <elementProp name="influxdbOrg" elementType="Argument">
                   <stringProp name="Argument.name">influxdbOrg</stringProp>
-                  <stringProp name="Argument.value">jmeter-org-Influx</stringProp>
+                  <stringProp name="Argument.value">test_org</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="application" elementType="Argument">
+                  <stringProp name="Argument.name">application</stringProp>
+                  <stringProp name="Argument.value">distributed_perf_testing</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="influxdbBucket" elementType="Argument">
+                  <stringProp name="Argument.name">influxdbBucket</stringProp>
+                  <stringProp name="Argument.value">jmeter_bucket</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="influxdbPrecision" elementType="Argument">
+                  <stringProp name="Argument.name">influxdbPrecision</stringProp>
+                  <stringProp name="Argument.value">${__P(influxdbPrecision)}</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
               </collectionProp>
             </elementProp>
-            <stringProp name="classname">org.apache.jmeter.visualizers.backend.influxdb.InfluxdbBackendListenerClient</stringProp>
+            <stringProp name="classname">org.apache.jmeter.visualizers.backend.influxdb.InfluxDBRawBackendListenerClient</stringProp>
           </BackendListener>
           <hashTree/>
         </hashTree>
