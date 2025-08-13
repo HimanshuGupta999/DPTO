@@ -8,8 +8,6 @@ on:
     branches:
       - main
 
-  workflow_dispatch:  # Enables trigger
-
 jobs:
   run-test:
     runs-on: ubuntu-latest
@@ -39,6 +37,7 @@ jobs:
       INFLUXDB_ORG: ${{ secrets.INFLUXDB_ORG }}
       INFLUXDB_TOKEN: ${{ secrets.INFLUXDB_TOKEN }}
       INFLUXDB_URL: ${{ secrets.INFLUXDB_URL }}
+
 
     steps:
       - name: Checkout code
@@ -112,15 +111,15 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: distributed-test-results
-          path: ./distributed-performance-testing/test-files/
+          path: ./distributed-performance-testing/test-files/results
 
       - name: Copy logs files to AiPerfTestAnalysis/inputs
         run: |
-          cp ./distributed-performance-testing/test-files/*.log ./AiPerfTestAnalysis/src/inputs/
+          cp ./distributed-performance-testing/test-files/results/*.log ./AiPerfTestAnalysis/src/inputs/
 
       - name: Copy statistics files to AiPerfTestAnalysis/inputs
         run: |
-          find ./distributed-performance-testing/test-files/ -type f -path "*/html_report*/statistics.json" -exec cp {} ./AiPerfTestAnalysis/src/inputs/ \; || echo "No statistics.json found"
+          find ./distributed-performance-testing/test-files/results/ -type f -path "*/html_report*/statistics.json" -exec cp {} ./AiPerfTestAnalysis/src/inputs/ \; || echo "No statistics.json found"
 
       - name: Create .env file inside AiPerfTestAnalysis
         working-directory: ./AiPerfTestAnalysis
