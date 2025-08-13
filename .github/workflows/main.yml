@@ -89,6 +89,23 @@ jobs:
         working-directory: ./distributed-performance-testing
         run: docker compose up --build -d
 
+      - name: Wait for InfluxDB & Grafana to be ready
+        run: |
+          echo "Waiting for InfluxDB to be healthy..."
+          until curl -s "${INFLUXDB_URL}/health" | grep -q "pass"; do
+            echo "InfluxDB not ready yet..."
+            sleep 5
+          done
+          echo "InfluxDB is ready."
+
+          echo "Waiting for Grafana to be healthy..."
+          until curl -s "http://localhost:3000/api/health" \
+            -u "${GRAFANA_ADMIN_USER}:${GRAFANA_ADMIN_PASSWORD}" | grep -q "ok"; do
+            echo "Grafana not ready yet..."
+            sleep 5
+          done
+          echo "Grafana is ready."
+
       - name: Run node index.js
         working-directory: ./distributed-performance-testing/src
         run: node index.js  
