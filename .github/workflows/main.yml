@@ -91,15 +91,22 @@ jobs:
 
       - name: Wait for InfluxDB & Grafana to be ready
         run: |
-          echo "Waiting for InfluxDB to be healthy..."
-          until curl -s "${INFLUXDB_URL}/health" | grep -q "pass"; do
-            echo "InfluxDB not ready yet..."
+          echo "Waiting for InfluxDB service..."
+          until nc -z localhost 8086; do
+            echo "InfluxDB TCP port not open yet..."
+            sleep 3
+          done
+          echo "TCP port open. Checking API readiness..."
+
+          until curl -s "${INFLUXDB_URL}/api/v2/buckets" \
+            --header "Authorization: Token ${INFLUXDB_TOKEN}" | grep -q "buckets"; do
+            echo "InfluxDB API not responding with valid auth yet..."
             sleep 5
           done
-          echo "InfluxDB is ready."
+          echo "InfluxDB is fully ready."
 
-          echo "Waiting for Grafana to be healthy..."
-          until curl -s "http://localhost:3000/api/health" \
+          echo "Waiting for Grafana..."
+          until curl -s "http://localhost:3001/api/health" \
             -u "${GRAFANA_ADMIN_USER}:${GRAFANA_ADMIN_PASSWORD}" | grep -q "ok"; do
             echo "Grafana not ready yet..."
             sleep 5
