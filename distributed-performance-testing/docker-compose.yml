@@ -12,7 +12,7 @@ services:
       - JMETER_DIR=/opt/apache-jmeter-${JMETER_VERSION}
       - TEST_PLAN_PATH=${TEST_PLAN_PATH}
       - RESULT_PATH=${RESULT_PATH}
-      - INFLUXDB_URL=http://172.28.100.2:8086/api/v2/write
+      - INFLUXDB_URL=http://influxdb:8086/api/v2/write
       - INFLUXDB_TOKEN=${INFLUXDB_TOKEN}
       - INFLUXDB_ORG=${INFLUXDB_ORG}
       - INFLUXDB_BUCKET=${INFLUXDB_BUCKET}
